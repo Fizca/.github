@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --text:#eef2f8; --muted:#8b97a9; --dim:#5f6b7e;
+    --node1:#141a26; --node2:#0f131c; --border:#242e40;
+    --cyan:#4ea8ff; --indigo:#7c5cff; --amber:#ffb64d;
+    --aws:#ff9f33; --cf:#f6821f; --mongo:#13c56b; --s3:#4ad6a0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{width:1600px; height:900px}
+  body{
+    font-family:-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+    color:var(--text); position:relative; overflow:hidden;
+    background:
+      radial-gradient(900px 520px at 16% 2%, rgba(78,168,255,0.10), transparent 60%),
+      radial-gradient(900px 600px at 92% 108%, rgba(124,92,255,0.12), transparent 55%),
+      linear-gradient(160deg, #0b0e14 0%, #080a0f 60%, #0a0d13 100%);
+  }
+  /* faint grid texture */
+  body::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size:46px 46px; mask-image:radial-gradient(1200px 700px at 50% 40%, #000 55%, transparent 100%);
+  }
+
+  .stage{position:absolute; inset:0}
+
+  /* header */
+  .kicker{position:absolute; left:80px; top:70px; font-size:15px; letter-spacing:5px;
+    color:var(--cyan); font-weight:700}
+  h1{position:absolute; left:78px; top:92px; font-size:62px; font-weight:800; letter-spacing:-1.5px;
+    background:linear-gradient(90deg,#ffffff, #c9d6ea); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .tag{position:absolute; left:80px; top:176px; font-size:21px; color:var(--muted); font-weight:500}
+
+  /* nodes */
+  .node{position:absolute; width:220px; height:150px; border-radius:18px;
+    background:linear-gradient(180deg, var(--node1), var(--node2));
+    border:1px solid var(--border); padding:18px 20px; z-index:3;
+    box-shadow:0 20px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+    display:flex; flex-direction:column; gap:9px}
+  .node .chip{display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px;
+    border-radius:11px; font-size:14px; font-weight:800; letter-spacing:0.5px; color:#0a0d12}
+  .node .t{font-size:23px; font-weight:800; letter-spacing:-0.3px; margin-top:2px}
+  .node .d{font-size:14.5px; color:var(--muted); line-height:1.35}
+  .chip.web{background:linear-gradient(135deg,#9fb6d6,#dfe8f6)}
+  .chip.cf{background:linear-gradient(135deg,#ffb067,var(--cf)); color:#1a0f02}
+  .chip.aws{background:linear-gradient(135deg,#ffc26b,var(--aws)); color:#1a1102}
+  .chip.db{background:linear-gradient(135deg,#39e38f,var(--mongo)); color:#032012}
+  .chip.s3{background:linear-gradient(135deg,#7ef0c6,var(--s3)); color:#032018}
+
+  /* hero node (Lambda) */
+  .node.hero{border-color:rgba(124,92,255,0.55);
+    box-shadow:0 0 0 1px rgba(124,92,255,0.25), 0 26px 60px rgba(80,60,180,0.35),
+      0 0 60px rgba(124,92,255,0.22), inset 0 1px 0 rgba(255,255,255,0.05)}
+  .node.hero .t{background:linear-gradient(90deg,#fff,#cbbcff); -webkit-background-clip:text; background-clip:text; color:transparent}
+
+  /* store nodes */
+  .store{height:118px}
+  .store .tagline{margin-top:auto; font-size:12px; font-weight:800; letter-spacing:1.5px; color:var(--amber)}
+
+  /* floating connector labels */
+  .plabel{position:absolute; z-index:4; transform:translate(-50%,-50%);
+    font-size:13px; color:#cfe0f5; font-weight:600; white-space:nowrap;
+    background:rgba(16,22,34,0.9); border:1px solid rgba(78,168,255,0.35);
+    padding:6px 12px; border-radius:999px; box-shadow:0 6px 18px rgba(0,0,0,0.4)}
+  .plabel.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace; letter-spacing:0.3px; color:#bfe9ff}
+
+  /* stat strip */
+  .stats{position:absolute; left:80px; right:80px; bottom:66px; display:flex; gap:0; z-index:3}
+  .stat{flex:1; padding:0 30px; position:relative}
+  .stat + .stat::before{content:""; position:absolute; left:0; top:6px; bottom:6px; width:1px;
+    background:linear-gradient(180deg, transparent, rgba(255,255,255,0.12), transparent)}
+  .stat .n{font-size:46px; font-weight:800; letter-spacing:-1px; line-height:1;
+    background:linear-gradient(90deg,var(--cyan),var(--indigo)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .stat .l{margin-top:8px; font-size:14.5px; color:var(--muted); line-height:1.4}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="kicker">SYSTEM ARCHITECTURE</div>
+  <h1>Fizca</h1>
+  <div class="tag">One request, three clouds, provisioned from a single Terraform codebase.</div>
+
+  <!-- SVG flow layer -->
+  <svg width="1600" height="900" style="position:absolute; inset:0; z-index:1">
+    <defs>
+      <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#4ea8ff"/>
+        <stop offset="1" stop-color="#7c5cff"/>
+      </linearGradient>
+      <linearGradient id="flowDown" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7c5cff"/>
+        <stop offset="1" stop-color="#4ad6a0"/>
+      </linearGradient>
+      <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#7c5cff"/>
+      </marker>
+      <marker id="arrowC" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#4ea8ff"/>
+      </marker>
+    </defs>
+
+    <!-- spine segments: halo + crisp line -->
+    <!-- s1 415->525 ; s2 745->855 ; s3 1075->1185  (y=360) -->
+    <g>
+      <line x1="415" y1="360" x2="520" y2="360" stroke="url(#flow)" stroke-width="9" opacity="0.28" filter="url(#glow)"/>
+      <line x1="415" y1="360" x2="520" y2="360" stroke="url(#flow)" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <line x1="745" y1="360" x2="850" y2="360" stroke="url(#flow)" stroke-width="9" opacity="0.28" filter="url(#glow)"/>
+      <line x1="745" y1="360" x2="850" y2="360" stroke="url(#flow)" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <line x1="1075" y1="360" x2="1180" y2="360" stroke="url(#flow)" stroke-width="9" opacity="0.28" filter="url(#glow)"/>
+      <line x1="1075" y1="360" x2="1180" y2="360" stroke="url(#flow)" stroke-width="3.5" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- flow packets (suggest motion) -->
+    <g fill="#bfe3ff">
+      <circle cx="455" cy="360" r="3" opacity="0.9"/><circle cx="478" cy="360" r="2.4" opacity="0.55"/>
+      <circle cx="785" cy="360" r="3" opacity="0.9"/><circle cx="808" cy="360" r="2.4" opacity="0.55"/>
+      <circle cx="1115" cy="360" r="3" opacity="0.9"/><circle cx="1138" cy="360" r="2.4" opacity="0.55"/>
+    </g>
+
+    <!-- branches from Lambda bottom (1295,435) to Atlas (975,560) and S3 (1285,560) -->
+    <g fill="none">
+      <path d="M1295,440 C1295,512 975,500 975,558" stroke="url(#flowDown)" stroke-width="8" opacity="0.22" filter="url(#glow)"/>
+      <path d="M1295,440 C1295,512 975,500 975,558" stroke="url(#flowDown)" stroke-width="3" marker-end="url(#arrowC)"/>
+      <path d="M1295,440 C1295,505 1285,505 1285,558" stroke="url(#flowDown)" stroke-width="8" opacity="0.22" filter="url(#glow)"/>
+      <path d="M1295,440 C1295,505 1285,505 1285,558" stroke="url(#flowDown)" stroke-width="3" marker-end="url(#arrowC)"/>
+    </g>
+  </svg>
+
+  <!-- spine nodes (y top = 285) -->
+  <div class="node" style="left:195px; top:285px">
+    <div class="chip web">UI</div>
+    <div class="t">Browser</div>
+    <div class="d">React + TypeScript SPA</div>
+  </div>
+  <div class="node" style="left:525px; top:285px">
+    <div class="chip cf">CF</div>
+    <div class="t">Cloudflare Pages</div>
+    <div class="d">SPA + <b>/api</b> edge proxy</div>
+  </div>
+  <div class="node" style="left:855px; top:285px">
+    <div class="chip aws">AWS</div>
+    <div class="t">API Gateway</div>
+    <div class="d">HTTP API, catch-all route</div>
+  </div>
+  <div class="node hero" style="left:1185px; top:285px">
+    <div class="chip aws">AWS</div>
+    <div class="t">Lambda</div>
+    <div class="d">Express container + Web Adapter</div>
+  </div>
+
+  <!-- store nodes (y top = 558) -->
+  <div class="node store" style="left:855px; top:558px">
+    <div class="chip db">DB</div>
+    <div class="t">MongoDB Atlas</div>
+    <div class="d">mongodb+srv, TLS + SCRAM</div>
+  </div>
+  <div class="node store" style="left:1165px; top:558px; border-color:#285a46">
+    <div class="chip s3">S3</div>
+    <div class="t">Amazon S3</div>
+    <div class="tagline">PRIVATE BUCKET</div>
+  </div>
+
+  <!-- connector labels -->
+  <div class="plabel" style="left:470px; top:322px">same origin &middot; no CORS</div>
+  <div class="plabel mono" style="left:800px; top:322px">x-proxy-secret</div>
+  <div class="plabel mono" style="left:1130px; top:322px">AWS_PROXY</div>
+
+  <!-- stat strip -->
+  <div class="stats">
+    <div class="stat"><div class="n">3</div><div class="l">clouds, one Terraform codebase<br>AWS &middot; Cloudflare &middot; Atlas</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">CORS by design<br>same-origin edge proxy</div></div>
+    <div class="stat"><div class="n">~$0</div><div class="l">to run, until roughly<br>1M requests / month</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">image, local and prod<br>keyless OIDC deploys</div></div>
+  </div>
+
+</div>
+</body>
+</html>

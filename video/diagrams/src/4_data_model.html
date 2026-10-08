@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --text:#eef2f8; --muted:#8b97a9; --border:#242e40; --node1:#141a26; --node2:#0f131c;
+    --cyan:#4ea8ff; --indigo:#7c5cff; --amber:#ffb64d; --green:#4ad6a0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{width:1600px; height:900px}
+  body{
+    font-family:-apple-system,"Segoe UI",Inter,Roboto,sans-serif; color:var(--text);
+    position:relative; overflow:hidden;
+    background:
+      radial-gradient(900px 520px at 14% 0%, rgba(78,168,255,0.10), transparent 60%),
+      radial-gradient(900px 600px at 94% 110%, rgba(124,92,255,0.12), transparent 55%),
+      linear-gradient(160deg, #0b0e14 0%, #080a0f 60%, #0a0d13 100%);
+  }
+  body::before{content:""; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size:46px 46px; mask-image:radial-gradient(1200px 760px at 50% 44%, #000 55%, transparent 100%)}
+
+  .kicker{position:absolute; left:80px; top:70px; font-size:15px; letter-spacing:5px; color:var(--cyan); font-weight:700}
+  h1{position:absolute; left:78px; top:92px; font-size:52px; font-weight:800; letter-spacing:-1.2px;
+    background:linear-gradient(90deg,#ffffff,#c9d6ea); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .tag{position:absolute; left:80px; top:168px; font-size:20px; color:var(--muted)}
+
+  .node{position:absolute; border-radius:16px; padding:16px 19px; z-index:3;
+    background:linear-gradient(180deg,var(--node1),var(--node2)); border:1px solid var(--border);
+    box-shadow:0 18px 38px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.04);
+    display:flex; flex-direction:column; gap:7px}
+  .node .k{font-size:12px; letter-spacing:2px; font-weight:800}
+  .node .t{font-weight:800; letter-spacing:-0.3px}
+  .node .d{font-size:14px; color:var(--muted); line-height:1.35}
+
+  /* Profile (hero, left) */
+  .profile{left:120px; top:360px; width:270px; height:188px; justify-content:center;
+    border-color:rgba(124,92,255,0.5);
+    box-shadow:0 0 0 1px rgba(124,92,255,0.22),0 24px 54px rgba(80,60,180,0.32),0 0 56px rgba(124,92,255,0.2),inset 0 1px 0 rgba(255,255,255,0.05)}
+  .profile .k{color:#c3b4ff}
+  .profile .t{font-size:34px; background:linear-gradient(90deg,#fff,#cbbcff); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .profile .d{font-size:15px; margin-top:4px}
+
+  /* entity column (middle) */
+  .entity{left:685px; width:280px; height:92px; justify-content:center}
+  .entity .t{font-size:21px}
+  .e1{top:290px} .e2{top:404px} .e3{top:518px}
+
+  /* Timeline (hero, right) */
+  .timeline{left:1180px; top:360px; width:300px; height:188px; justify-content:center;
+    border-color:rgba(74,214,160,0.5);
+    box-shadow:0 0 0 1px rgba(74,214,160,0.2),0 24px 54px rgba(20,110,80,0.3),0 0 56px rgba(74,214,160,0.18),inset 0 1px 0 rgba(255,255,255,0.05)}
+  .timeline .k{color:#8ff0cb}
+  .timeline .t{font-size:32px; background:linear-gradient(90deg,#fff,#b7f3dc); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .timeline .d{font-size:14.5px; margin-top:6px}
+
+  .stats{position:absolute; left:80px; right:80px; bottom:70px; display:flex; z-index:3}
+  .stat{flex:1; padding:0 30px; position:relative}
+  .stat:first-child{padding-left:0}
+  .stat + .stat::before{content:""; position:absolute; left:0; top:4px; bottom:4px; width:1px;
+    background:linear-gradient(180deg,transparent,rgba(255,255,255,0.12),transparent)}
+  .stat .n{font-size:42px; font-weight:800; letter-spacing:-1px; line-height:1;
+    background:linear-gradient(90deg,var(--cyan),var(--indigo)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .stat .l{margin-top:7px; font-size:14.5px; color:var(--muted); line-height:1.4}
+</style>
+</head>
+<body>
+  <div class="kicker">FIZCA &middot; DATA MODEL</div>
+  <h1>One timeline</h1>
+  <div class="tag">Separate record types, stitched into a single chronological, tag-filterable feed.</div>
+
+  <svg width="1600" height="900" style="position:absolute; inset:0; z-index:1">
+    <defs>
+      <linearGradient id="fanL" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#4ea8ff"/>
+      </linearGradient>
+      <linearGradient id="fanR" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#4ea8ff"/><stop offset="1" stop-color="#4ad6a0"/>
+      </linearGradient>
+      <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <marker id="aL" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#4ea8ff"/></marker>
+      <marker id="aR" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#4ad6a0"/></marker>
+    </defs>
+
+    <!-- Profile (right edge x=390, cy=454) fans to 3 entities (left x=685) -->
+    <g fill="none">
+      <path d="M390,454 C540,454 560,336 683,336" stroke="url(#fanL)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M390,454 C540,454 560,336 683,336" stroke="url(#fanL)" stroke-width="2.5" marker-end="url(#aL)"/>
+      <path d="M390,454 C545,454 560,450 683,450" stroke="url(#fanL)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M390,454 C545,454 560,450 683,450" stroke="url(#fanL)" stroke-width="2.5" marker-end="url(#aL)"/>
+      <path d="M390,454 C540,454 560,564 683,564" stroke="url(#fanL)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M390,454 C540,454 560,564 683,564" stroke="url(#fanL)" stroke-width="2.5" marker-end="url(#aL)"/>
+    </g>
+
+    <!-- 3 entities (right edge x=965) fan to Timeline (left x=1180, cy=454) -->
+    <g fill="none">
+      <path d="M967,336 C1090,336 1110,454 1178,454" stroke="url(#fanR)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M967,336 C1090,336 1110,454 1178,454" stroke="url(#fanR)" stroke-width="2.5" marker-end="url(#aR)"/>
+      <path d="M967,450 C1090,450 1110,454 1178,454" stroke="url(#fanR)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M967,450 C1090,450 1110,454 1178,454" stroke="url(#fanR)" stroke-width="2.5" marker-end="url(#aR)"/>
+      <path d="M967,564 C1090,564 1110,454 1178,454" stroke="url(#fanR)" stroke-width="8" opacity="0.2" filter="url(#glow)"/>
+      <path d="M967,564 C1090,564 1110,454 1178,454" stroke="url(#fanR)" stroke-width="2.5" marker-end="url(#aR)"/>
+    </g>
+  </svg>
+
+  <div class="node profile">
+    <div class="k">ROOT</div>
+    <div class="t">Profile</div>
+    <div class="d">the person being documented: name, nickname, birthday</div>
+  </div>
+
+  <div class="node entity e1"><div class="t">Moments</div><div class="d">text journal entries</div></div>
+  <div class="node entity e2"><div class="t">Assets</div><div class="d">photos + EXIF metadata</div></div>
+  <div class="node entity e3"><div class="t">Tags</div><div class="d">per-profile labels</div></div>
+
+  <div class="node timeline">
+    <div class="k">UNIFIED FEED</div>
+    <div class="t">Timeline</div>
+    <div class="d">merges photos and moments, sorted by when they happened and filterable by tag</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">2</div><div class="l">record types<br>merged into one feed</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">timeline<br>by date taken, not upload time</div></div>
+    <div class="stat"><div class="n">tag</div><div class="l">filterable<br>per-profile labels</div></div>
+  </div>
+</body>
+</html>
