@@ -2,36 +2,43 @@
 
 A home for the things I build on my own time. Everything here is designed, coded, and shipped by me, start to finish.
 
-The current project is Journey.
+The current project is Fizca.
 
-## Journey
+## What it is
 
-Journey is a private, invite-only photo and memory journal. You create a profile for someone you care about, a kid or a pet, and fill it over time with photos, journal entries, and growth stats. It all lands on one timeline you can scroll and filter by tag.
+Fizca is a private, invite-only photo and memory journal. You create a profile for someone you care about, a kid or a pet, and fill it over time with photos and journal entries. It all lands on one timeline you can scroll and filter by tag.
 
-I built every layer: the React frontend, the CSS, the REST API, the image pipeline, the data model, and the cloud infrastructure. Every technology choice was deliberate.
+I built every layer: the React frontend, the CSS, the REST API, the image pipeline, the data model, and the cloud infrastructure. Every technology choice was deliberate, and the diagrams below walk through the ones that matter most.
 
-![Journey system topology](./assets/journey-topology.png)
+## Architecture
 
-### How it is built
+![Fizca system topology](./assets/fizca-topology.png)
 
-**Frontend**
-- React with strict TypeScript, built with Vite, state managed with MobX.
-- A hand-coded design system: CSS custom properties for the tokens, styled-components for the pieces, Framer Motion for transitions.
-- A hand-built infinite-scroll feed using an IntersectionObserver and a small fetch hook, no data-fetching library.
+The whole backend is serverless and costs close to nothing until roughly a million requests a month. The browser only ever talks to one origin: a Cloudflare Pages function proxies every `/api` call to AWS, so there is no CORS to configure, there is simply no cross-origin request to begin with. Behind that proxy sit an HTTP API Gateway and a Lambda, with MongoDB Atlas and a private S3 bucket holding the data and the images. The entire stack, across AWS, Cloudflare, and MongoDB Atlas, is defined in one Terraform codebase and deployed with keyless GitHub Actions through OIDC, so there are no long-lived cloud keys sitting in CI.
 
-**Backend**
-- A plain Express REST API on Node.
-- Image pipeline: EXIF extraction, SHA-256 opaque filenames, and Sharp resizing into three renditions.
-- Images live in a private S3 bucket and are never public. The server either streams them through an authenticated request or hands out a pre-signed URL that expires in five minutes.
-- Auth is Google OAuth, verified offline against Google's public keys, with a closed invite allowlist and server-side sessions. No passwords stored.
+## The image pipeline
 
-**Infrastructure**
-- Serverless and close to zero cost until roughly a million requests a month.
-- The Express app ships as a container image on AWS Lambda via the Lambda Web Adapter, so the same image runs locally and in production.
-- CORS is designed out: a Cloudflare Pages function proxies every request so the SPA and the API share one origin.
-- One Terraform codebase across AWS, Cloudflare, and MongoDB Atlas. Deploys are keyless through GitHub Actions OIDC.
+![Fizca image pipeline](./assets/fizca-image-pipeline.png)
 
-### Links
+Images are the core of the product, so they are also where most of the security decisions live. On upload, the server reads the photo's EXIF data for location and date, hashes the filename so it is opaque, and uses Sharp to produce three sizes before storing them in a private S3 bucket. Nothing in that bucket is public. When the app needs to show a photo, the server either streams it through an authenticated request or hands out a pre-signed URL that expires in five minutes. There is no permanent public link to anyone's photos.
+
+## Authentication
+
+![Fizca authentication](./assets/fizca-authentication.png)
+
+Authentication is offloaded to Google, so there are no passwords to store. When a user signs in, the client sends a Google ID token and the server verifies it offline against Google's public keys, with no callback round-trip and no client secret to leak. Access is closed on top of that: only pre-invited accounts can log in, and a small role ladder, guest to contributor to admin, controls what each user can do. Identity lives in a server-side session, not a token in the browser.
+
+## Data model
+
+![Fizca data model](./assets/fizca-data-model.png)
+
+Photos and journal moments are stored as separate records, but they are stitched into a single timeline, sorted by when each thing actually happened rather than when it was uploaded. Tags are per-profile labels that make the whole feed filterable. That unified timeline is what ties the product together.
+
+## The frontend
+
+The frontend is React with strict TypeScript, built with Vite, with state managed by MobX. There is no component library: the design system is hand-coded with CSS custom properties and styled-components, and transitions use Framer Motion. The photo feed is an infinite scroll I wrote myself, an IntersectionObserver plus a small fetch hook, with no data-fetching library.
+
+## Links
 
 - Backend: https://github.com/Fizca/server
 - Frontend: https://github.com/Fizca/client
