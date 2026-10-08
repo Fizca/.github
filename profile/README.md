@@ -1,10 +1,6 @@
 # Fizca
 
-A home for the things I build on my own time. Everything here is designed, coded, and shipped by me, start to finish.
-
-The current project is Fizca.
-
-## What it is
+> Fizca means **soul** in quechua.
 
 Fizca is a private, invite-only photo and memory journal. You create a profile for someone you care about, a kid or a pet, and fill it over time with photos and journal entries. It all lands on one timeline you can scroll and filter by tag.
 
