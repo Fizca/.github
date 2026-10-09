@@ -38,4 +38,4 @@ The frontend is React with strict TypeScript, built with Vite, with state manage
 
 - Backend: https://github.com/Fizca/server
 - Frontend: https://github.com/Fizca/client
-- Walkthrough video: [coming soon](https://youtu.be/REPLACE_WITH_VIDEO_ID)
+- Walkthrough video: [Fizca Tech Walkthrough](https://youtu.be/24PsF98nUVE)
