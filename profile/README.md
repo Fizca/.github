@@ -34,6 +34,10 @@ Photos and journal moments are stored as separate records, but they are stitched
 
 The frontend is React with strict TypeScript, built with Vite, with state managed by MobX. There is no component library: the design system is hand-coded with CSS custom properties and styled-components, and transitions use Framer Motion. The photo feed is an infinite scroll I wrote myself, an IntersectionObserver plus a small fetch hook, with no data-fetching library.
 
+# Walkthrough
+
+[![Watch the demo](https://img.youtube.com/vi/24PsF98nUVE/maxresdefault.jpg)](https://youtu.be/24PsF98nUVE)
+
 ## Links
 
 - Backend: https://github.com/Fizca/server
